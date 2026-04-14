@@ -1,0 +1,13 @@
+# Large demo source video — keep only the web-playable H.264 version in git
+assets/videos/demo/AniGen_video.mp4
+!assets/videos/demo/AniGen_video_h264.mp4
+assets/videos/results/**/.bak/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

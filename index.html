@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniGen: Unified S³ Fields for Animatable 3D Asset Generation</title>
+    <meta name="description" content="AniGen presents a unified generative framework that directly generates animate-ready 3D assets conditioned on a single image. SIGGRAPH 2026.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="AniGen: Unified S³ Fields for Animatable 3D Asset Generation">
+    <meta property="og:description" content="A unified framework for animatable 3D asset generation from single images. SIGGRAPH 2026.">
+    <meta property="og:image" content="assets/images/teaser.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-logo">AniGen</a>
+            <div class="nav-links">
+                <a href="#abstract">Abstract</a>
+                <a href="#video">Video</a>
+                <a href="#results">Results</a>
+                <a href="#comparisons">Comparisons</a>
+                <a href="#method">Method</a>
+                <a href="#citation">BibTeX</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-content" data-animate>
+            <a href="https://s2026.siggraph.org/" target="_blank" class="venue-logo-link">
+                <img src="assets/images/siggraph2026-logo.png" alt="SIGGRAPH 2026" class="venue-logo">
+            </a>
+
+            <h1 class="paper-title">
+                AniGen: <span class="title-thin">Unified <em>S<sup>3</sup></em> Fields for Animatable 3D Asset Generation</span>
+            </h1>
+
+            <div class="authors">
+                <span class="author"><a href="https://yihua7.github.io/website/" target="_blank">Yi-Hua Huang</a><sup>1</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Zi-Xin Zou<sup>2</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Yuting He<sup>3</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Chirui Chang<sup>1</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Cheng-Feng Pu<sup>4</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Ziyi Yang<sup>1</sup></span>
+                <span class="author-sep"></span>
+                <span class="author">Yuan-Chen Guo<sup>2</sup></span>
+                <span class="author-sep"></span>
+                <span class="author"><a href="https://yanpei.me/" target="_blank">Yan-Pei Cao</a><sup>2&dagger;</sup></span>
+                <span class="author-sep"></span>
+                <span class="author"><a href="https://xjqi.github.io/" target="_blank">Xiaojuan Qi</a><sup>1&dagger;</sup></span>
+            </div>
+
+            <div class="affiliations">
+                <span><sup>1</sup>The University of Hong Kong</span>
+                <span class="aff-dot"></span>
+                <span><sup>2</sup>VAST</span>
+                <span class="aff-dot"></span>
+                <span><sup>3</sup>The Chinese University of Hong Kong</span>
+                <span class="aff-dot"></span>
+                <span><sup>4</sup>Tsinghua University</span>
+            </div>
+            <div class="author-note">
+                <span>&dagger; Corresponding authors</span>
+            </div>
+
+            <div class="action-buttons">
+                <a href="assets/pdf/AniGen.pdf" class="btn btn-glass" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Paper
+                </a>
+                <a href="https://arxiv.org/pdf/2604.08746" class="btn btn-glass" target="_blank">
+                    <i class="fas fa-book"></i> ArXiv
+                </a>
+                <a href="https://github.com/VAST-AI-Research/AniGen" class="btn btn-primary" target="_blank">
+                    <i class="fab fa-github"></i> Code
+                </a>
+                <a href="https://huggingface.co/spaces/VAST-AI/AniGen" class="btn btn-glass" target="_blank">
+                    🤗 Demo
+                </a>
+                <a href="https://www.tripo3d.ai/" class="btn btn-glass" target="_blank">
+                    <i class="fas fa-cube"></i> Tripo
+                </a>
+                <a href="#video" class="btn btn-glass scroll-link">
+                    <i class="fas fa-play"></i> Video
+                </a>
+            </div>
+        </div>
+
+        <div class="teaser-container" data-animate data-delay="200">
+            <button class="music-toggle muted" id="music-toggle" title="Toggle sound">
+                <i class="fas fa-music"></i>
+            </button>
+            <div class="teaser-video-wrap">
+                <video id="teaser-video" class="teaser-img" playsinline preload="auto">
+                    <source src="assets/videos/teaser/teaser_h264.mp4" type="video/mp4">
+                    <source src="assets/videos/teaser/teaser.mp4" type="video/mp4">
+                </video>
+            </div>
+            <p class="teaser-caption">Given a single conditional image, <em>AniGen</em> generates a 3D shape along with its skeleton and skinning weights, supporting animals, humanoids, and machinery.</p>
+        </div>
+    </section>
+
+    <!-- Abstract -->
+    <section id="abstract" class="section section-white">
+        <div class="container">
+            <h2 class="section-title" data-animate><span class="title-icon"><i class="fas fa-align-left"></i></span> Abstract</h2>
+            <div class="abstract-text" data-animate>
+                <p>
+                    Animatable 3D assets, defined as geometry equipped with an articulated skeleton and skinning weights, are fundamental to interactive graphics, embodied agents, and animation production. While recent 3D generative models can synthesize visually plausible shapes from images, the results are typically static. Obtaining usable rigs via post-hoc auto-rigging is brittle and often produces skeletons that are topologically inconsistent with the generated geometry. We present <strong>AniGen</strong>, a unified framework that directly generates animate-ready 3D assets conditioned on a single image. Our key insight is to represent shape, skeleton, and skinning as mutually consistent <em>S<sup>3</sup> Fields</em> (Shape, Skeleton, Skin) defined over a shared spatial domain. To enable the robust learning of these fields, we introduce two technical innovations: (i) a <em>confidence-decaying skeleton field</em> that explicitly handles the geometric ambiguity of bone prediction at Voronoi boundaries, and (ii) a <em>dual skin feature field</em> that decouples skinning weights from specific joint counts, allowing a fixed-architecture network to predict rigs of arbitrary complexity. Built upon a two-stage flow-matching pipeline, AniGen first synthesizes a sparse structural scaffold and then generates dense geometry and articulation in a structured latent space. Extensive experiments demonstrate that AniGen substantially outperforms state-of-the-art sequential baselines in rig validity and animation quality, generalizing effectively to in-the-wild images across diverse categories including animals, humanoids, and machinery.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Video -->
+    <section id="video" class="section section-dark">
+        <div class="container-wide">
+            <h2 class="section-title section-title-light" data-animate><span class="title-icon"><i class="fas fa-play-circle"></i></span> Video</h2>
+            <div class="video-container" data-animate>
+                <div class="video-wrapper">
+                    <video id="demo-video" controls preload="metadata" poster="assets/images/teaser.png">
+                        <source src="assets/videos/demo/AniGen_video_h264.mp4" type="video/mp4">
+                        <source src="assets/videos/demo/AniGen_video.mp4" type="video/mp4">
+                    </video>
+                    <div class="video-play-overlay" id="demo-play-overlay">
+                        <div class="play-button-large">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Gallery -->
+    <section id="results" class="section section-white">
+        <div class="container-wide">
+            <h2 class="section-title" data-animate><span class="title-icon"><i class="fas fa-cube"></i></span> Results</h2>
+            <p class="section-subtitle" data-animate>Each row shows one subject across six viewpoints. The last three columns overlay the generated skeleton.</p>
+
+            <!-- Group tabs -->
+            <div class="results-group-tabs" data-animate>
+                <button class="results-group-tab" data-group="1">Animals</button>
+                <button class="results-group-tab active" data-group="2">Characters</button>
+                <button class="results-group-tab" data-group="3">Objects</button>
+            </div>
+
+            <!-- Column header (video type labels, shown once) -->
+            <div class="results-header" data-animate>
+                <div class="results-header-spacer"></div>
+                <div>360° Rotation</div>
+                <div>Initial Pose 360°</div>
+                <div>Fixed Camera</div>
+                <div>360° + Skeleton</div>
+                <div>Initial Pose + Skeleton</div>
+                <div>Fixed Camera + Skeleton</div>
+            </div>
+
+            <!-- Group 1: Animals — dog, eagle, horse, bird, whale -->
+            <div class="results-group" data-group="1">
+                <div class="results-row" data-subject="dog" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/dog/dog2.png" alt="Dog">
+                        <span>Dog</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/dog/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="eagle" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/eagle/eagle.png" alt="Eagle">
+                        <span>Eagle</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/eagle/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="horse" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/horse/horse.jpeg" alt="Horse">
+                        <span>Horse</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/horse/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="bird" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/bird/bird.png" alt="Bird">
+                        <span>Bird</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bird/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="whale" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/whale/whale.png" alt="Whale">
+                        <span>Whale</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/whale/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+            </div>
+
+            <!-- Group 2: Characters — iron_boy, evo, mairo, child, brickbob, bruno_star, woman -->
+            <div class="results-group active" data-group="2">
+                <div class="results-row" data-subject="iron_boy" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/iron_boy/iron_boy.png" alt="Iron Boy">
+                        <span>Iron Boy</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/iron_boy/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="evo" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/evo/evo.png" alt="Evo">
+                        <span>Evo</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/evo/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="mairo" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/mairo/mairo.png" alt="Mairo">
+                        <span>Mairo</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/mairo/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="child" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/child/child.webp" alt="Child">
+                        <span>Child</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/child/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="brickbob" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/brickbob/brickbob.png" alt="BrickBob">
+                        <span>BrickBob</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/brickbob/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="bruno_star" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/bruno_star/bruno_star.png" alt="Bruno Star">
+                        <span>Bruno Star</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/bruno_star/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="woman" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/woman/woman.png" alt="Woman">
+                        <span>Woman</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/woman/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+            </div>
+
+            <!-- Group 3: Objects — machine_arm, machine_hand, macbook, plant, machine_dog, money_tree -->
+            <div class="results-group" data-group="3">
+                <div class="results-row" data-subject="machine_arm" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/machine_arm/machine_arm.png" alt="Machine Arm">
+                        <span>Machine Arm</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_arm/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="machine_hand" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/machine_hand/machine_hand.png" alt="Machine Hand">
+                        <span>Machine Hand</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_hand/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="macbook" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/macbook/macbook.png" alt="Macbook">
+                        <span>Macbook</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/macbook/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="plant" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/plant/plant.png" alt="Plant">
+                        <span>Plant</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/plant/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="machine_dog" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/machine_dog/machine_dog.png" alt="Machine Dog">
+                        <span>Machine Dog</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/machine_dog/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+
+                <div class="results-row" data-subject="money_tree" data-animate>
+                    <div class="results-row-label">
+                        <img src="assets/videos/results/money_tree/money_tree.png" alt="Money Tree">
+                        <span>Money Tree</span>
+                    </div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/rotating_360.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/rotating_360_initial_pose.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/fixed_camera.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/rotating_360_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/rotating_360_initial_pose_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                    <div class="result-cell"><video data-src="assets/videos/results/money_tree/fixed_camera_skeleton.mp4" loop muted playsinline preload="none"></video></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparisons -->
+    <section id="comparisons" class="section section-gray">
+        <div class="container-wide">
+            <h2 class="section-title" data-animate><span class="title-icon"><i class="fas fa-columns"></i></span> Comparisons</h2>
+            <p class="section-subtitle" data-animate>AniGen vs. state-of-the-art auto-rigging baselines. Second row shows skeleton overlay.</p>
+
+            <!-- Scene Tabs -->
+            <div class="scene-tabs" data-animate>
+                <button class="scene-tab active" data-scene="flower">Flower</button>
+                <button class="scene-tab" data-scene="fox">Fox</button>
+                <button class="scene-tab" data-scene="leave">Leaf</button>
+                <button class="scene-tab" data-scene="mouse">Mouse</button>
+            </div>
+
+            <!-- Comparison Grid -->
+            <div class="comparison-grid" id="comparison-grid" data-animate>
+                <!-- Dynamically populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Method -->
+    <section id="method" class="section section-white">
+        <div class="container">
+            <h2 class="section-title" data-animate><span class="title-icon"><i class="fas fa-cogs"></i></span> Method</h2>
+            <p class="method-summary" data-animate>
+                AniGen co-generates shape, skeleton, and skinning through unified <em>S<sup>3</sup> Fields</em>. We introduce a confidence-decaying skeleton field to handle geometric ambiguity at bone prediction boundaries, and a dual skin feature field that enables joint-count agnostic skinning. A two-stage flow-matching pipeline first synthesizes sparse structure, then generates dense geometry and articulation.
+            </p>
+            <figure class="method-figure" data-animate>
+                <img src="assets/images/pipeline.png" alt="AniGen pipeline overview" class="method-img clickable-img" data-full="assets/images/pipeline.png">
+                <figcaption>
+                    <strong>Pipeline overview.</strong> AniGen encodes shapes with their skeletons and skinning into unified S<sup>3</sup> Fields, then compresses them into structured latents via auto-encoding. A two-stage flow model generates these structured latents from image-conditioned noise.
+                </figcaption>
+            </figure>
+            <figure class="method-figure" data-animate>
+                <img src="assets/images/flow_model.png" alt="Two-stage flow model architecture" class="method-img clickable-img" data-full="assets/images/flow_model.png">
+                <figcaption>
+                    <strong>Two-stage flow model.</strong> Stage 1 (Sparse Structure Flow) generates a sparse structural scaffold. Stage 2 (Structured Latent Flow) produces dense geometry and articulation conditioned on the scaffold.
+                </figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <!-- BibTeX -->
+    <section id="citation" class="section section-gray">
+        <div class="container">
+            <h2 class="section-title" data-animate><span class="title-icon"><i class="fas fa-quote-left"></i></span> Citation</h2>
+            <div class="bibtex-block" data-animate>
+                <button class="copy-btn" id="copy-bibtex" title="Copy to clipboard">
+                    <i class="fas fa-copy"></i> <span class="copy-text">Copy</span>
+                </button>
+<pre><code id="bibtex-content">@article{huang2026anigen,
+  title     = {AniGen: Unified $S^3$ Fields for Animatable 3D Asset Generation},
+  author    = {Huang, Yi-Hua and Zhou, Zi-Xin and He, Yuting and Chang, Chirui
+               and Pu, Cheng-Feng and Yang, Ziyi and Guo, Yuan-Chen
+               and Cao, Yan-Pei and Qi, Xiaojuan},
+  journal   = {ACM SIGGRAPH},
+  year      = {2026}
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>This work is in collaboration with <a href="https://www.tripo3d.ai" target="_blank">VAST</a>.</p>
+                <p class="footer-note">Website template inspired by <a href="https://nerfies.github.io/" target="_blank">Nerfies</a>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close">&times;</button>
+        <img src="" alt="" class="lightbox-img" id="lightbox-img">
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
